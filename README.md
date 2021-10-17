@@ -17,3 +17,11 @@ pip3 install -r requirements.txt
 ```sh
 python3 queen.py
 ```
+## Installation using with release
+Go To
+```sh
+https://github.com/HAsanxietyHA/Queen/releases
+```
+if you using windows rename queen file to queen.exe
+
+## Goodluck
