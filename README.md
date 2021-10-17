@@ -4,7 +4,7 @@ This is the first version of this script<br />
 In the next version will be added the proxy method to brutefoce via changing the proxy servers
 
 ## INSTALLATION
-if you using Firefox<br>
+### Firefox
 You need to install geckodriver<br>
 ```sh
 https://github.com/mozilla/geckodriver/releases
@@ -32,7 +32,7 @@ pip3 install -r requirements.txt
 ```sh
 python3 queen.py
 ```
-## Installation using with release
+## Installation from release
 Go To
 ```sh
 https://github.com/HAsanxietyHA/Queen/releases
