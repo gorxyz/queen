@@ -4,7 +4,7 @@ This is the first version of this script<br />
 In the next version will be added the proxy method to brutefoce via changing the proxy servers
 
 ## INSTALLATION
-### Firefox
+### If you using Firefox
 You need to install geckodriver<br>
 ```sh
 https://github.com/mozilla/geckodriver/releases
@@ -14,7 +14,8 @@ Install last version of geckodriver<br>
 sudo mv geckodriver /usr/bin/
 ```
 
-For Chromium go to <br>
+### If you using Chromium
+You need to install chromedriver
 ```sh
 https://chromedriver.chromium.org/downloads
 ```
