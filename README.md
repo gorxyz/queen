@@ -5,18 +5,12 @@ In the next version will be added the proxy method to brutefoce via changing the
 
 ## INSTALLATION
 
-``sh
-git clone https://github.com/HAsanxietyHA/Queen.git
+```sh
+git clone https://github.com/HAsanxietyHA/Queen
 ```
-``sh
-cd Queen
+```sh
+cd Queen/
 ```
-``sh
+```sh
 pip3 install -r requirements.txt
-```
-``sh
-chmod +x queen.py
-```
-``sh
-./queen.py
 ```
