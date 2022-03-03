@@ -17,7 +17,7 @@ sudo pacman -S tor (sudo apt-get install tor if u using debian)
 ```sh
 sudo systemctl enable tor
 ```
-
+## Launch
 ```sh
 python3 queen.py tor
 ```
