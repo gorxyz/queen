@@ -1,43 +1,28 @@
 # Queen
-## 𝙱𝚛𝚞𝚝𝚎𝚏𝚘𝚛𝚌𝚎 𝚊𝚝𝚝𝚊𝚌𝚔 𝚝𝚘 𝚒𝚗𝚜𝚝𝚊𝚐𝚛𝚊𝚖 𝚞𝚜𝚎𝚛𝚗𝚊𝚖𝚎 𝚠𝚒𝚝𝚑 𝙿𝚢𝚝𝚑𝚘𝚗/𝚂𝚎𝚕𝚎𝚗𝚒𝚞𝚖
-This is the first version of this script<br />
-In the next version will be added the proxy method to brutefoce via changing the proxy servers
+## 𝙱𝚛𝚞𝚝𝚎𝚏𝚘𝚛𝚌𝚎 𝚊𝚝𝚝𝚊𝚌𝚔 𝚝𝚘 𝚒𝚗𝚜𝚝𝚊𝚐𝚛𝚊𝚖 𝚞𝚜𝚎𝚛𝚗𝚊𝚖𝚎 𝚠𝚒𝚝𝚑 𝙿𝚢𝚝𝚑𝚘𝚗
+!TODO: new proxy list
 
 ## INSTALLATION
-### If you using Firefox
-You need to install geckodriver<br>
 ```sh
-https://github.com/mozilla/geckodriver/releases
-```
-Install last version of geckodriver<br>
-```sh
-sudo mv geckodriver /usr/bin/
+git clone https://github.com/sudurraaa/Queen.git
 ```
 
-### If you using Chromium
-You need to install chromedriver
-```sh
-https://chromedriver.chromium.org/downloads
-```
-and do the same
-
-```sh
-git clone https://github.com/HAsanxietyHA/Queen
-```
 ```sh
 cd Queen/
 ```
+If u want to run the script with tor proxy servers u need Linux
 ```sh
-pip3 install -r requirements.txt
+sudo pacman -S tor (sudo apt-get install tor if u using debian)
 ```
 ```sh
-python3 queen.py
+sudo systemctl enable tor
 ```
-## Installation from release
-Go To
-```sh
-https://github.com/HAsanxietyHA/Queen/releases
-```
-if you using windows rename queen file to queen.exe
 
+```sh
+python3 queen.py tor
+```
+or 
+```sh
+python3 queen.py default
+```
 ## Goodluck
