@@ -18,8 +18,13 @@ If u want to run the script with tor proxy servers u need Linux
 ```sh
 sudo pacman -S tor #(sudo apt-get install tor if u using debian)
 ```
+### systemd
 ```sh
 sudo systemctl enable tor
+```
+### runit
+```sh
+sudo ln -s /etc/sv/tor /var/service/ && sudo sv up tor
 ```
 ## Launch
 ```sh
