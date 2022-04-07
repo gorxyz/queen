@@ -4,15 +4,19 @@
 
 ## INSTALLATION
 ```sh
-git clone https://github.com/sudurraaa/Queen.git
+git clone https://github.com/sudurraaa/queen.git
+```
+### Dependencies
+```sh
+herbe, python3
 ```
 
 ```sh
-cd Queen/
+cd queen/
 ```
 If u want to run the script with tor proxy servers u need Linux
 ```sh
-sudo pacman -S tor (sudo apt-get install tor if u using debian)
+sudo pacman -S tor #(sudo apt-get install tor if u using debian)
 ```
 ```sh
 sudo systemctl enable tor
