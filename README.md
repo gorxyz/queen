@@ -25,7 +25,7 @@ pip3 install -r requirements.txt
 ```
 ## Launch
 ```sh
-python3 queen.py --enable
+python3 queen.py --tor enable
 ```
 ```sh
 python3 queen.py --tor disable
