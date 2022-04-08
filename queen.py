@@ -119,13 +119,13 @@ def main():
     try:
         bruteforce = open(wordlist, "r")
     except FileNotFoundError:
-        print("[-] wordlist file not found\ntrying to open wordlist.txt file")
+        print("[-] wordlist file not found\n[+] trying to open wordlist.txt file")
         try:
             bruteforce = open(f'{wordlist}.txt', 'r')
         except FileNotFoundError:
-            print("wordlist.txt file not found")
+            print("[-] wordlist.txt file not found")
             exit()
-
+    print('[+] changing wordlist path to {wordlist}.txt')
     save = input("[+] do you want ot save tryed passwords(y/n): ")
     if save.lower() == "y":
         print(f"[+] the tryed passwords file path will be tryed/{target}.txt")
