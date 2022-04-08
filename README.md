@@ -1,22 +1,9 @@
 # Queen
 ## 𝙱𝚛𝚞𝚝𝚎𝚏𝚘𝚛𝚌𝚎 𝚊𝚝𝚝𝚊𝚌𝚔 𝚝𝚘 𝚒𝚗𝚜𝚝𝚊𝚐𝚛𝚊𝚖 𝚞𝚜𝚎𝚛𝚗𝚊𝚖𝚎 𝚠𝚒𝚝𝚑 𝙿𝚢𝚝𝚑𝚘𝚗
-!TODO: new proxy list
-
-## INSTALLATION
+!TODO: improve tor server integration and spam undetection
+## Dependencies
 ```sh
-git clone https://github.com/sudurraaa/queen.git
-```
-### Dependencies
-```sh
-herbe, python3
-```
-
-```sh
-cd queen/
-```
-If u want to run the script with tor proxy servers u need Linux
-```sh
-sudo pacman -S tor #(sudo apt-get install tor if u using debian)
+herbe(not required), python3-pip, tor(if u want tor server)
 ```
 ### systemd
 ```sh
@@ -26,12 +13,24 @@ sudo systemctl enable tor
 ```sh
 sudo ln -s /etc/sv/tor /var/service/ && sudo sv up tor
 ```
+## INSTALLATION
+```sh
+git clone https://github.com/sudurraaa/queen.git
+```
+```sh
+cd queen/
+```
+```sh
+pip3 install -r requirements.txt
+```
 ## Launch
 ```sh
-python3 queen.py tor
+python3 queen.py --enable
 ```
-or 
 ```sh
-python3 queen.py default
+python3 queen.py --tor disable
 ```
-## Goodluck
+for help
+```sh
+python3 queen.py -h
+```
