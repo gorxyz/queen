@@ -9,7 +9,7 @@ from datetime import datetime
 from fake_user_agents import fake_agent
 
 instagram_url = "https://www.instagram.com/accounts/login/"
-instagram_url_login = "https://www.instagram.com/accounts/login/ajax/"
+instagram_url_login = "https://www.instagram.com/accounts/login/d__amara/"
 
 payload = {
     "queryParams" : {},
